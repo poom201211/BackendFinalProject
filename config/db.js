@@ -1,8 +1,9 @@
+require('dotenv').config()
 // Export mongoose
 const mongoose = require("mongoose");
 
 //Assign MongoDB connection string to Uri and declare options settings
-var uri = "mongodb+srv://FinalProjectSke15:Abd567k89@cluster0.f8bgn.mongodb.net/FinalProjectDemo"
+var uri = process.env.ABCD
 
 // Declare a variable named option and assign optional settings
 const options = {

@@ -14,22 +14,20 @@ exports.signIn = (request, response) => {
   User.findOne({ email: email }, (error, user) => {
     // Database error
     if (error) {
-      response.status(500).json({ message: error.message });
+      return response.status(500).json({ message: error.message });
     }
 
     // Invalid email
     if (!user) {
-      response.status(401).json({ message: "invalid email" });
+        return response.status(401).json({ message: "invalid email" });
     }
-
     try {
       // Compare password to password in database
       const checkedPassword = bcrypt.compareSync(password, user.password);
 
       if (!checkedPassword) {
-        response.status(401).json({ message: "incorrect password" });
+        return response.status(401).json({ message: "incorrect password" });
       }
-
       const userSign = {
         id: user._id,
         username: user.username,
@@ -37,9 +35,9 @@ exports.signIn = (request, response) => {
 
       // encode to jwt format
       const authToken = jwt.sign(userSign, KEY);
-      response.status(200).json({ authToken: authToken });
+      return response.status(200).json({ authToken: authToken });
     } catch (error) {
-      response.status(500).json({ message: error.message });
+        return response.status(500).json({ message: error.message });
     }
   });
 };
@@ -49,11 +47,11 @@ exports.signUp = (request, response) => {
 
   User.findOne({ email: email }, (error, user) => {
     if (error) {
-      response.status(500).json({ message: error.message });
+        return response.status(500).json({ message: error.message });
     }
 
     if (user) {
-      response.status(401).json({ message: "Email is already used" });
+        return response.status(401).json({ message: "Email is already used" });
     }
 
     let hashedPassword;
@@ -62,7 +60,7 @@ exports.signUp = (request, response) => {
       // hash password before store in database
       hashedPassword = bcrypt.hashSync(password, ROUND);
     } catch (error) {
-      response.status(500).json({ message: error.message });
+        return response.status(500).json({ message: error.message });
     }
     const newUser = new User({
       email: email,
@@ -71,7 +69,7 @@ exports.signUp = (request, response) => {
     });
     newUser.save((error, user) => {
       if (error) {
-        response.status(500).json({ message: error.message });
+        return response.status(500).json({ message: error.message });
       }
       try {
         const userSign = {
@@ -80,9 +78,9 @@ exports.signUp = (request, response) => {
         };
         // encode to jwt format
         const authToken = jwt.sign(userSign, KEY);
-        response.status(200).json({ authToken: authToken });
+        return response.status(200).json({ authToken: authToken });
       } catch (error) {
-        response.status(500).json({ message: error.message });
+        return response.status(500).json({ message: error.message });
       }
     });
   });

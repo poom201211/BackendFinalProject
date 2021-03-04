@@ -1,29 +1,29 @@
-'use strict';
+"use strict";
 
 // create App function
 module.exports = function (app) {
-    var todoList = require('../controllers/todoController');
-    const userController = require('../controllers/usersController');
-    // todoList Routes
+  var todoList = require("../controllers/todoController");
+  const userController = require("../controllers/usersController");
+  const pinController = require("../controllers/pinController");
 
-    // get and post request for /todos endpoints
-    app
-        .route("/todos")
-        .get(todoList.listAllTodos)
-        .post(todoList.createNewTodo);
+  // Routes
 
-    // put and delete request for /todos endpoints
-    app
-        .route("/todo/:id")
-        .put(todoList.updateTodo)
-        .delete(todoList.deleteTodo);
+  // get and post request for /todos endpoints
+  app.route("/todos").get(todoList.listAllTodos).post(todoList.createNewTodo);
 
-    // Authentication routes
+  // put and delete request for /todos endpoints
+  app.route("/todo/:id").put(todoList.updateTodo).delete(todoList.deleteTodo);
 
-    // sign in
-    app.route("/signIn").post(userController.signIn);
+  // Authentication routes
 
-    // sign up
-    app.route("/signUp").post(userController.signUp);
+  // sign in
+  app.route("/signIn").post(userController.signIn);
 
+  // sign up
+  app.route("/signUp").post(userController.signUp);
+
+  // Pin routes
+
+  // List all the 30 demo kratoo pins
+  app.route("/pins").get(pinController.listPins);
 };

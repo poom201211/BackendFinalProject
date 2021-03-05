@@ -29,5 +29,5 @@ app.listen(port, () => {
 require("./config/db");
 
 // Import API route
-var routes = require('./api/routes/todoRoutes'); //importing route
+var routes = require('./api/routes/routes'); //importing route
 routes(app);

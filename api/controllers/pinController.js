@@ -1,7 +1,7 @@
 // import pin Model
 const pin = require("../models/pinModel");
 
-exports.types = (req, res) => {
+exports.types = (req, response) => {
   var type = req.query.type;
 
   const typeList = ["cafe", "attraction", "restaurant", "all"];

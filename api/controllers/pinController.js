@@ -11,11 +11,20 @@ exports.types = (req, response) => {
   }
   if (type === "all") {
     pin.find({}, (err, pin) => {
-      response.status(200).json(pin);
-    });
+      if(err){
+        return response.status(500).json({ message: err.message });
+      }else{
+        return response.status(200).json(pin);
+      }
+    }
+    );
   } else {
     pin.find({ type: req.query.type }, (err, pin) => {
-      response.status(200).json(pin);
+      if(err){
+        return response.status(500).json({ message: err.message });
+      }else{
+        return response.status(200).json(pin);
+      }
     });
   }
 };

@@ -30,4 +30,6 @@ module.exports = function (app) {
 
   app.route("/collection_detail/:collectionId").get(collectionController.getCollectionById);
 
+  app.route("/collections").get(collectionController.getListUserCollection);
+
 };

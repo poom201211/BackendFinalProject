@@ -1,5 +1,6 @@
 // imports
 const collection = require("../models/collectionsModel");
+const pin = require("../models/pinModel");
 const jwt = require("jsonwebtoken");
 
 // Create new collection from image, title, userId from userToken
@@ -47,17 +48,15 @@ exports.copyCollection = async (req, res) => {
 // Edit collection
 exports.editCollection = async (req, res) => {
   try {
-    let {
-      collection_image,
-      collection_title,
-      collectionId,
-      userToken,
-    } = req.body;
+    let {collection_image,collection_title,collectionId,userToken,} = req.body;
     var collectionResult = await collection.findById(collectionId).exec();
     console.log(collectionResult);
     if (collectionResult === null) {
       return res.status(404).send({ message: "Collection not found" });
     } else {
+        collection.updateMany(
+            collectionResult.collectionImage
+        )
     }
   } catch (error) {
     console.log(error);
@@ -94,10 +93,14 @@ exports.getCollectionById = async (req, res) => {
   if (collectionResult === null) {
     return res.status(404).send({ message: "Collection not found" });
   } else {
-      var collection_image = collectionResult.collectionImage;
-      var collection_title = collectionResult.collectionTitle;
-    return res
-      .status(200)
-      .json({collection_image,collection_title});
+    var collection_image = collectionResult.collectionImage;
+    var collection_title = collectionResult.collectionTitle;
+    return res.status(200).json({ collection_image, collection_title });
   }
 };
+
+// Get list of collection by id in userToken
+exports.getListUserCollection = async (req, res) => {
+    var token = req.query.token;
+}
+

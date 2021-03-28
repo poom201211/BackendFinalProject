@@ -18,6 +18,8 @@ module.exports = function (app) {
   // List all the 30 demo kratoo pins
   app.route("/pin").get(pinController.types);
 
+
+  // List of collection methods routes
   app.route("/create_new_collection").post(collectionController.createNewCollection);
 
   app.route("/copy_collection").post(collectionController.copyCollection);
@@ -25,5 +27,7 @@ module.exports = function (app) {
   app.route("/edit_collection").put(collectionController.editCollection);
 
   app.route("/delete_collection").delete(collectionController.deleteCollection);
+
+  app.route("/collection_detail/:collectionId").get(collectionController.getCollectionById);
 
 };

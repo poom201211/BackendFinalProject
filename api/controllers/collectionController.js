@@ -47,13 +47,17 @@ exports.copyCollection = async (req, res) => {
 // Edit collection
 exports.editCollection = async (req, res) => {
   try {
-    let {collection_image, collection_title, collectionId, userToken} = req.body
+    let {
+      collection_image,
+      collection_title,
+      collectionId,
+      userToken,
+    } = req.body;
     var collectionResult = await collection.findById(collectionId).exec();
     console.log(collectionResult);
     if (collectionResult === null) {
       return res.status(404).send({ message: "Collection not found" });
-    }else{
-        
+    } else {
     }
   } catch (error) {
     console.log(error);
@@ -79,5 +83,21 @@ exports.deleteCollection = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(400).send({ message: error.message });
+  }
+};
+
+// Get collection detail from collection id
+exports.getCollectionById = async (req, res) => {
+  var collectionId = req.params.collectionId;
+  var collectionResult = await collection.findById(collectionId).exec();
+  console.log(collectionResult);
+  if (collectionResult === null) {
+    return res.status(404).send({ message: "Collection not found" });
+  } else {
+      var collection_image = collectionResult.collectionImage;
+      var collection_title = collectionResult.collectionTitle;
+    return res
+      .status(200)
+      .json({collection_image,collection_title});
   }
 };

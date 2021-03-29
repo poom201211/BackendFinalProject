@@ -32,7 +32,13 @@ module.exports = function (app) {
 
   app.route("/delete_collection").delete(collectionController.deleteCollection);
 
-  app.route("/collection_detail/:collectionId").get(collectionController.getCollectionById);
+  app.route("/collection_detail/:collection_id").get(collectionController.getCollectionById);
 
   app.route("/collections").get(collectionController.getListUserCollection);
+
+  app.route("/collection/:collection_id").get(collectionController.getCollection);
+
+  app.route("/add_to_collection").post(collectionController.addKratooToCollection);
+
+  app.route("/update_to_collection").put(collectionController.updateKratooToCollection);
 };

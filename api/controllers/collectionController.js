@@ -1,6 +1,7 @@
 // imports
 const collection = require("../models/collectionsModel");
 const pin = require("../models/pinModel");
+const user = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 // Global variables
@@ -51,16 +52,18 @@ exports.createNewCollection = async (req, res) => {
 // create new collection from the existed collection [ owned by another user ] [from collection id]
 exports.copyCollection = async (req, res) => {
   try {
-    let { collectionObjectId, userToken } = req.body;
-    var collectionResult = await collection.findById(collectionObjectId).exec();
+    let { collection_id, userToken } = req.body;
+    var collectionResult = await collection
+      .findOne({ collectionID: collection_id })
+      .exec();
     console.log(collectionResult);
     if (collectionResult === null) {
       return res.status(404).send({ message: "Collection not found" });
     } else {
       var decodedToken = jwt.decode(userToken);
-      var collection_id = await randomInt(100000000, 999999999);
+      var collectionCreateId = await randomInt(100000000, 999999999);
       const newCollection = new collection({
-        collectionID: collection_id,
+        collectionID: collectionCreateId,
         collectionTitle: collectionResult.collectionTitle,
         user_id: decodedToken.id,
         collectionIcon: collectionResult.collectionIcon,
@@ -82,27 +85,27 @@ exports.editCollection = async (req, res) => {
       collection_icon,
       collection_color,
       collection_title,
-      collectionObjectId,
+      collection_id,
       userToken,
     } = req.body;
     var decodedToken = jwt.decode(userToken);
-    var collectionResultObjectID = await collection
-      .findById(collectionObjectId)
+    var collectionResultID = await collection
+      .findOne({ collectionID: collection_id })
       .exec();
-    console.log(collectionResultObjectID.user_id, decodedToken.id);
+    console.log(collectionResultID.user_id, decodedToken.id);
 
-    if (!collectionResultObjectID.user_id == decodedToken.id) {
+    if (!collectionResultID.user_id == decodedToken.id) {
       return res.status(404).send({ message: "Collection and User not found" });
     } else {
-      collection.findByIdAndUpdate(
-        collectionObjectId,
+      collection.findOneAndUpdate(
+        {collectionID: collection_id},
         {
-          collectionID: collectionResultObjectID.collectionID,
+          collectionID: collectionResultID.collectionID,
           collectionTitle: collection_title,
           collectionColor: collection_color,
           collectionIcon: collection_icon,
-          user_id: collectionResultObjectID.user_id,
-          kratoo_ids: collectionResultObjectID.kratoo_ids,
+          user_id: collectionResultID.user_id,
+          kratoo_ids: collectionResultID.kratoo_ids,
         },
         function (err, data) {
           if (err) return res.status(400).send({ message: error.message });
@@ -122,9 +125,9 @@ exports.editCollection = async (req, res) => {
 // Delete collection
 exports.deleteCollection = async (req, res) => {
   try {
-    let { collectionObjectId } = req.body;
-    await collection.findByIdAndDelete(
-      collectionObjectId,
+    let { collection_id } = req.body;
+    await collection.findOneAndDelete(
+      { collectionID: collection_id },
       function (err, collection) {
         if (err) {
           console.log(err);
@@ -142,8 +145,8 @@ exports.deleteCollection = async (req, res) => {
 
 // Get collection detail from collection id
 exports.getCollectionById = async (req, res) => {
-  var collectionObjectId = req.params.collectionId;
-  var collectionResult = await collection.findById(collectionObjectId).exec();
+  var collection_id = req.params.collection_id;
+  var collectionResult = await collection.findOne({collectionID:collection_id}).exec();
   console.log(collectionResult);
   if (collectionResult === null) {
     return res.status(404).send({ message: "Collection not found" });
@@ -162,15 +165,87 @@ exports.getListUserCollection = async (req, res) => {
   var token = req.query.token;
   try {
     var decodedToken = jwt.verify(token, KEY);
-    var collectionUserId = decodedToken.id;
-    var collectionResultUserId = await collection.findOne({user_id:collectionUserId}).exec();
-    console.log(collectionResultUserId);
-    console.log(decodedToken);
-    if (!collectionResultUserId.user_id == decodedToken.id) {
-      return res.status(401).send({ message: "User authentication failed" });
-    } else {
-      
+    var userCollection = await collection
+      .find({ user_id: decodedToken.id })
+      .exec();
+    const result = userCollection.map((record) => {
+      console.log(record);
+      const {
+        collectionIcon,
+        collectionColor,
+        collectionTitle,
+        collectionID,
+        kratoo_ids,
+      } = record;
+      return {
+        collectionIcon,
+        collectionColor,
+        collectionTitle,
+        collectionID,
+        kratooCount: kratoo_ids.length,
+      };
+    });
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ message: error.message });
+  }
+};
+
+// Get owner(username of collection owner) and list of kratoo in collection by collection id
+exports.getCollection = async (req, res) => {
+  try {
+    var token = req.query.token;
+    var collection_id = req.params.collection_id;
+    var decodedToken = jwt.verify(token, KEY);
+    var userCollection = await user.findOne({ username: decodedToken.username }).exec();
+    var collectionResultId = await collection.findOne({collectionID: collection_id}).exec();
+    var ownerCollection = await user.findById(collectionResultId.user_id).exec(); 
+
+    if(collectionResultId != null){
+      var resultOwner = {owner: ownerCollection.username,isOwner: collectionResultId.user_id == String(userCollection._id)}
+      console.log(collectionResultId.user_id,userCollection._id)
+      console.log(userCollection)
+      return res.status(200).json(resultOwner);
+    }else{
+      return res.status(401).send({ message: "User authentication fail" });
     }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ message: error.message });
+  }
+};
+
+// Add kratoo to collection
+exports.addKratooToCollection = async (req, res) => {
+  try {
+    let { kratoo_id, collection_id } = req.body;
+    let arrayOfCollection = collection_id.split(",");
+
+    arrayOfCollection.forEach((collectionid) => {
+      collection
+        .updateOne(
+          { collectionID: collectionid },
+          {
+            $addToSet: {
+              kratoo_ids: kratoo_id,
+            },
+          }
+        )
+        .exec();
+    });
+    return res
+      .status(200)
+      .json({ message: "Kratoo has been added to all the collections" });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ message: error.message });
+  }
+};
+
+exports.updateKratooToCollection = (req, res) => {
+  try {
+    return res.status(200).send({ message: "Hello world 2023" });
   } catch (error) {
     console.log(error);
     return res.status(400).send({ message: error.message });

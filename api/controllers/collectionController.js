@@ -3,19 +3,38 @@ const collection = require("../models/collectionsModel");
 const pin = require("../models/pinModel");
 const jwt = require("jsonwebtoken");
 
-// Function for collection ID generation
+// Global variables
+const KEY = "secretKey";
+
+// Function for collection ID generation with 9 numbers
+async function randomInt(low, high) {
+  var createID = Math.floor(Math.random() * (high - low) + low);
+  const unique = createID;
+  const collectionResult = await collection
+    .findOne({ collectionID: unique })
+    .exec();
+  if (collectionResult === null) {
+    return unique;
+  } else {
+    return randomInt(low, high);
+  }
+}
 
 // Create new collection from image, title, userId from userToken
-exports.createNewCollection = (req, res) => {
+exports.createNewCollection = async (req, res) => {
   try {
     let {
       collection_title,
       userToken,
       collection_icon,
-      collection_color
+      collection_color,
     } = req.body;
+
     var decodedToken = jwt.decode(userToken);
+    var collection_id = await randomInt(100000000, 999999999);
+
     const newCollection = new collection({
+      collectionID: collection_id,
       collectionTitle: collection_title,
       user_id: decodedToken.id,
       collectionIcon: collection_icon,
@@ -32,18 +51,20 @@ exports.createNewCollection = (req, res) => {
 // create new collection from the existed collection [ owned by another user ] [from collection id]
 exports.copyCollection = async (req, res) => {
   try {
-    let { collectionId, userToken } = req.body;
-    var collectionResult = await collection.findById(collectionId).exec();
+    let { collectionObjectId, userToken } = req.body;
+    var collectionResult = await collection.findById(collectionObjectId).exec();
     console.log(collectionResult);
     if (collectionResult === null) {
       return res.status(404).send({ message: "Collection not found" });
     } else {
       var decodedToken = jwt.decode(userToken);
+      var collection_id = await randomInt(100000000, 999999999);
       const newCollection = new collection({
+        collectionID: collection_id,
         collectionTitle: collectionResult.collectionTitle,
         user_id: decodedToken.id,
         collectionIcon: collectionResult.collectionIcon,
-        collectionColor: collectionResult.collectionColor
+        collectionColor: collectionResult.collectionColor,
       });
       newCollection.save();
       return res.status(200).json({ message: "Collection copied to new user" });
@@ -61,15 +82,36 @@ exports.editCollection = async (req, res) => {
       collection_icon,
       collection_color,
       collection_title,
-      collectionId,
+      collectionObjectId,
       userToken,
     } = req.body;
-    var collectionResult = await collection.findById(collectionId).exec();
-    console.log(collectionResult);
-    if (collectionResult === null) {
-      return res.status(404).send({ message: "Collection not found" });
+    var decodedToken = jwt.decode(userToken);
+    var collectionResultObjectID = await collection
+      .findById(collectionObjectId)
+      .exec();
+    console.log(collectionResultObjectID.user_id, decodedToken.id);
+
+    if (!collectionResultObjectID.user_id == decodedToken.id) {
+      return res.status(404).send({ message: "Collection and User not found" });
     } else {
-      collection.updateMany(collectionResult.collectionColor,collectionResult.collectionIcon);
+      collection.findByIdAndUpdate(
+        collectionObjectId,
+        {
+          collectionID: collectionResultObjectID.collectionID,
+          collectionTitle: collection_title,
+          collectionColor: collection_color,
+          collectionIcon: collection_icon,
+          user_id: collectionResultObjectID.user_id,
+          kratoo_ids: collectionResultObjectID.kratoo_ids,
+        },
+        function (err, data) {
+          if (err) return res.status(400).send({ message: error.message });
+
+          console.log(data);
+          return res.status(200).send();
+        }
+      );
+      return res.status(200).json({ message: "Edit collection complete" });
     }
   } catch (error) {
     console.log(error);
@@ -80,9 +122,9 @@ exports.editCollection = async (req, res) => {
 // Delete collection
 exports.deleteCollection = async (req, res) => {
   try {
-    let { collectionId } = req.body;
+    let { collectionObjectId } = req.body;
     await collection.findByIdAndDelete(
-      collectionId,
+      collectionObjectId,
       function (err, collection) {
         if (err) {
           console.log(err);
@@ -100,8 +142,8 @@ exports.deleteCollection = async (req, res) => {
 
 // Get collection detail from collection id
 exports.getCollectionById = async (req, res) => {
-  var collectionId = req.params.collectionId;
-  var collectionResult = await collection.findById(collectionId).exec();
+  var collectionObjectId = req.params.collectionId;
+  var collectionResult = await collection.findById(collectionObjectId).exec();
   console.log(collectionResult);
   if (collectionResult === null) {
     return res.status(404).send({ message: "Collection not found" });
@@ -118,4 +160,19 @@ exports.getCollectionById = async (req, res) => {
 // Get list of collection by id in userToken
 exports.getListUserCollection = async (req, res) => {
   var token = req.query.token;
+  try {
+    var decodedToken = jwt.verify(token, KEY);
+    var collectionUserId = decodedToken.id;
+    var collectionResultUserId = await collection.findOne({user_id:collectionUserId}).exec();
+    console.log(collectionResultUserId);
+    console.log(decodedToken);
+    if (!collectionResultUserId.user_id == decodedToken.id) {
+      return res.status(401).send({ message: "User authentication failed" });
+    } else {
+      
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ message: error.message });
+  }
 };

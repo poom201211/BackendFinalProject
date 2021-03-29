@@ -66,6 +66,7 @@ exports.signUp = (request, response) => {
       email: email,
       password: hashedPassword,
       username: username,
+      user_color: '#ffffff'
     });
     newUser.save((error, user) => {
       if (error) {

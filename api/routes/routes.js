@@ -1,16 +1,21 @@
 "use strict";
 
-const userController = require("../controllers/userController");
+const authController = require("../controllers/authController");
 const pinController = require("../controllers/pinController");
+const userProfileController = require("../controllers/userProfileController");
 
 // create App function
 module.exports = function (app) {
 
   // sign in
-  app.route("/signIn").post(userController.signIn);
+  app.route("/signIn").post(authController.signIn);
 
   // sign up
-  app.route("/signUp").post(userController.signUp);
+  app.route("/signUp").post(authController.signUp);
+
+  app.route("/user/:userToken").get(userProfileController.getUser).patch(userProfileController.updateUser);
+
+  app.route("/user/:userToken/password").patch(userProfileController.updatePassword)
 
   // Pin routes
 

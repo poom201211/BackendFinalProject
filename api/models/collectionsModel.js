@@ -7,11 +7,19 @@ const Schema = mongoose.Schema;
 
 // Create Schema Instance and add schema propertise
 const CollectionSchema = new Schema({
+    collectionID: {
+        type: String,
+        required: true
+    },
     collectionTitle: {
         type: String,
         required: true
     },
-    collectionImage: {
+    collectionColor: {
+        type: String,
+        required: true
+    },
+    collectionIcon: {
         type: String,
         required: true
     },

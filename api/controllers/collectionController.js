@@ -98,7 +98,7 @@ exports.editCollection = async (req, res) => {
       return res.status(404).send({ message: "Collection and User not found" });
     } else {
       collection.findOneAndUpdate(
-        {collectionID: collection_id},
+        { collectionID: collection_id },
         {
           collectionID: collectionResultID.collectionID,
           collectionTitle: collection_title,
@@ -146,7 +146,9 @@ exports.deleteCollection = async (req, res) => {
 // Get collection detail from collection id
 exports.getCollectionById = async (req, res) => {
   var collection_id = req.params.collection_id;
-  var collectionResult = await collection.findOne({collectionID:collection_id}).exec();
+  var collectionResult = await collection
+    .findOne({ collectionID: collection_id })
+    .exec();
   console.log(collectionResult);
   if (collectionResult === null) {
     return res.status(404).send({ message: "Collection not found" });
@@ -199,15 +201,27 @@ exports.getCollection = async (req, res) => {
     var collection_id = req.params.collection_id;
     var decodedToken = jwt.verify(token, KEY);
     var userCollection = await user.findOne({ username: decodedToken.username }).exec();
-    var collectionResultId = await collection.findOne({collectionID: collection_id}).exec();
-    var ownerCollection = await user.findById(collectionResultId.user_id).exec(); 
+    var collectionResultId = await collection.findOne({ collectionID: collection_id }).exec();
+    var ownerCollection = await user.findById(collectionResultId.user_id).exec();
 
-    if(collectionResultId != null){
-      var resultOwner = {owner: ownerCollection.username,isOwner: collectionResultId.user_id == String(userCollection._id)}
-      console.log(collectionResultId.user_id,userCollection._id)
-      console.log(userCollection)
+    const arrayKratooId = [];
+    for (kratoo of collectionResultId.kratoo_ids) {
+      var collectionKratooId = await pin.findOne({ kratooID: kratoo }).exec();
+      var kratooTitle = collectionKratooId.kratooTitle;
+      var kratooId = collectionKratooId.kratooID
+      arrayKratooId.push({kratoo_title: kratooTitle, kratoo_id: kratooId})
+    }
+
+    if (collectionResultId != null) {
+      var resultOwner = {
+        owner: ownerCollection.username,
+        isOwner: collectionResultId.user_id == String(userCollection._id),
+        blogs: arrayKratooId,
+      };
+      console.log(collectionResultId.user_id, userCollection._id);
+      console.log(userCollection);
       return res.status(200).json(resultOwner);
-    }else{
+    } else {
       return res.status(401).send({ message: "User authentication fail" });
     }
   } catch (error) {
@@ -243,6 +257,7 @@ exports.addKratooToCollection = async (req, res) => {
   }
 };
 
+// Update kratoo in collection
 exports.updateKratooToCollection = (req, res) => {
   try {
     return res.status(200).send({ message: "Hello world 2023" });

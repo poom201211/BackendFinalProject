@@ -258,9 +258,22 @@ exports.addKratooToCollection = async (req, res) => {
 };
 
 // Update kratoo in collection
-exports.updateKratooToCollection = (req, res) => {
+exports.updateKratooToCollection = async (req, res) => {
   try {
-    return res.status(200).send({ message: "Hello world 2023" });
+    let { kratoo_id, collection_ids } = req.body;
+    let arrayOfCollection = collection_ids.split(",");
+    for (collectionId of arrayOfCollection) {
+      var collectionID = await collection.findOne({ collectionID: collectionId }).exec();
+      var collectionCheck = collectionID.kratoo_ids.indexOf(kratoo_id);
+      if(collectionCheck == -1){
+        collectionID.kratoo_ids.push(kratoo_id);
+        collectionID.save()
+      }else{
+        collectionID.kratoo_ids.splice(collectionCheck, 1);
+        collectionID.save()
+      }
+    }
+    return res.status(200).send({ message: "Collection updated" });
   } catch (error) {
     console.log(error);
     return res.status(400).send({ message: error.message });

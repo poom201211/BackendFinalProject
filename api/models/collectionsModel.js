@@ -6,36 +6,32 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Create Schema Instance and add schema propertise
-const PinSchema = new Schema({
-    kratooID: {
-        type: Number,
-        required: true
-    },
-    kratooTitle: {
+const CollectionSchema = new Schema({
+    collectionID: {
         type: String,
         required: true
     },
-    kratooDesc: {
+    collectionTitle: {
         type: String,
         required: true
     },
-    type: {
+    collectionColor: {
         type: String,
         required: true
     },
-    postions: {
-        type: Object,
-        required:true
-    },    
-    nickname: {
+    collectionIcon: {
         type: String,
         required: true
     },
-    created_time: {
-        type: String,
+    user_id: {
+        type: mongoose.Types.ObjectId,
+        required: true
+    },
+    kratoo_ids: {
+        type: [Number],
         required: true
     }
 });
 
 // create and export model
-module.exports = mongoose.model("Pins", PinSchema);
+module.exports = mongoose.model("Collections", CollectionSchema);

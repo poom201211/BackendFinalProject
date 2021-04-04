@@ -10,21 +10,27 @@ module.exports = function (app) {
   // sign in
   app.route("/signIn").post(authController.signIn);
 
-
   // sign up
   app.route("/signUp").post(authController.signUp);
 
-  app.route("/user/:userToken").get(userProfileController.getUser).patch(userProfileController.updateUser);
+  app
+    .route("/user/:userToken")
+    .get(userProfileController.getUser)
+    .patch(userProfileController.updateUser);
 
-  app.route("/user/:userToken/password").patch(userProfileController.updatePassword);
-
+  app
+    .route("/user/:userToken/password")
+    .patch(userProfileController.updatePassword);
 
   // Pin routes
   app.route("/pin").get(pinController.types);
 
+  app.route("/kratoo/:kratooId").get(pinController.getKratooByKratooId);
 
   // List of collection methods routes
-  app.route("/create_new_collection").post(collectionController.createNewCollection);
+  app
+    .route("/create_new_collection")
+    .post(collectionController.createNewCollection);
 
   app.route("/copy_collection").post(collectionController.copyCollection);
 
@@ -32,13 +38,23 @@ module.exports = function (app) {
 
   app.route("/delete_collection").delete(collectionController.deleteCollection);
 
-  app.route("/collection_detail/:collection_id").get(collectionController.getCollectionById);
+  app
+    .route("/collection_detail/:collection_id")
+    .get(collectionController.getCollectionById);
 
   app.route("/collections").get(collectionController.getListUserCollection);
 
-  app.route("/collection/:collection_id").get(collectionController.getCollection);
+  app
+    .route("/collection/:collection_id")
+    .get(collectionController.getCollection);
 
-  app.route("/add_to_collection").post(collectionController.addKratooToCollection);
+  app.route('/collection/kratoo/:kratooId').get(collectionController.getCollectionByKratooId)
 
-  app.route("/update_to_collection").put(collectionController.updateKratooToCollection);
+  app
+    .route("/add_to_collection")
+    .post(collectionController.addKratooToCollection);
+
+  app
+    .route("/update_to_collection")
+    .put(collectionController.updateKratooToCollection);
 };

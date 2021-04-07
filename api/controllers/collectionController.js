@@ -55,6 +55,7 @@ exports.copyCollection = async (req, res) => {
         user_id: decodedToken.id,
         collectionIcon: collectionResult.collectionIcon,
         collectionColor: collectionResult.collectionColor,
+        kratoo_ids: collectionResult.kratoo_ids,
       });
       newCollection.save();
       return res.status(200).json({ message: "Collection copied to new user" });
@@ -196,8 +197,11 @@ exports.getCollection = async (req, res) => {
 
     if (collectionResultId != null) {
       var resultOwner = {
+        owner: {
+          username: ownerCollection.username,
+          color: ownerCollection.user_color,
+        },
         title: collectionResultId.collectionTitle,
-        owner: ownerCollection.username,
         isOwner: String(collectionResultId.user_id) == String(decodedToken.id),
         blogs: arrayKratooId,
       };

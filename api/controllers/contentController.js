@@ -20,6 +20,6 @@ exports.userContent = async (req,res) => {
         return res.status(200).json(userContent);
     } catch (error) {
         console.log(error)
-        return res.status(400).json({ message: "Bruh" });
+        return res.status(400).json({ message: error });
     }
 }

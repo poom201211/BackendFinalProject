@@ -27,10 +27,10 @@ exports.userContent = async (req, res) => {
     if (allContent._source.tags.filter(value => ["เที่ยวไทย", "สถานที่ท่องเที่ยวในประเทศ", "สถานที่ท่องเที่ยวกรุงเทพฯ", "ประเทศไทย"].includes(value)).length > 0){
       typeContent = "attraction"
     }
-    if (allContent._source.tags.filter(value => ["คาเฟ่ (Cafe)" , "ร้านกาแฟ", "ร้านอาหาร"].includes(value)).length > 0){
+    else if (allContent._source.tags.filter(value => ["คาเฟ่ (Cafe)" , "ร้านกาแฟ", "ร้านอาหาร"].includes(value)).length > 0){
       typeContent = "cafe"
     }
-    if (allContent._source.tags.filter(value => ["ร้านอาหาร", "อาหาร", "อาหารคาว"].includes(value)).length > 0){
+    else if (allContent._source.tags.filter(value => ["ร้านอาหาร", "อาหาร", "อาหารคาว"].includes(value)).length > 0){
       typeContent = "restaurant"
     }
     

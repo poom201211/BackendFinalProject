@@ -14,7 +14,18 @@ exports.types = (req, res) => {
       if (err) {
         return res.status(500).json({ message: err.message });
       } else {
-        return res.status(200).json(pin);
+        var result = pin.map((onePin) => {
+          var resultPin = {
+            kratooTitle: onePin.kratooTitle,
+            type: onePin.type,
+            positions: onePin.postions,
+            created_time: onePin.created_time,
+            emotion: onePin.emotion,
+          };
+          return resultPin
+        })
+        
+        return res.status(200).json(result);
       }
     });
   } else {
@@ -22,9 +33,18 @@ exports.types = (req, res) => {
       if (err) {
         return res.status(500).json({ message: err.message });
       } else {
-        return res.status(200).json(pin);
+        var result = pin.map((onePin) => {
+          var resultPin = {
+            kratooTitle: onePin.kratooTitle,
+            type: onePin.type,
+            positions: onePin.postions,
+            created_time: onePin.created_time,
+            emotion: onePin.emotion,
+          };
+          return resultPin
+        })
+        return res.status(200).json(result);
       }
     });
   }
 };
-

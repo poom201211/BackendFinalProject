@@ -25,7 +25,7 @@ const PinSchema = new Schema({
     },
     postions: {
         type: Object,
-        required:true
+        required: false
     },    
     nickname: {
         type: String,
@@ -33,6 +33,10 @@ const PinSchema = new Schema({
     },
     created_time: {
         type: String,
+        required: true
+    },
+    emotion: {
+        type: Object,
         required: true
     }
 });

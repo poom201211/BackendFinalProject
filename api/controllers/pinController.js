@@ -28,18 +28,3 @@ exports.types = (req, res) => {
   }
 };
 
-exports.getKratooByKratooId = (req, res) => {
-  const { kratooId } = req.params;
-
-  Pin.findOne({ kratooID: kratooId }, (err, kratoo) => {
-    if (err) {
-      return res.status(500).json({ message: err.message });
-    }
-
-    if (!!!kratoo) {
-      return res.status(500).json({ message: "Review not found" });
-    }
-
-    return res.status(200).json({ kratoo: kratoo });
-  });
-};

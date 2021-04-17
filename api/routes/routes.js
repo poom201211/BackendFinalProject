@@ -4,6 +4,7 @@ const authController = require("../controllers/authController");
 const pinController = require("../controllers/pinController");
 const userProfileController = require("../controllers/userProfileController");
 const collectionController = require("../controllers/collectionController");
+const contentController = require("../controllers/contentController")
 
 // create App function
 module.exports = function (app) {
@@ -25,7 +26,7 @@ module.exports = function (app) {
   // Pin routes
   app.route("/pin").get(pinController.types);
 
-  app.route("/kratoo/:kratooId").get(pinController.getKratooByKratooId);
+  app.route("/kratoo/:kratooId").get(contentController.userContent);
 
   // List of collection methods routes
   app
@@ -57,4 +58,5 @@ module.exports = function (app) {
   app
     .route("/update_to_collection")
     .put(collectionController.updateKratooToCollection);
+
 };

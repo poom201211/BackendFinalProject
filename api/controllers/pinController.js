@@ -32,10 +32,10 @@ exports.types = (req, res) => {
                 pinsArray.push(pinArray);
                 pinArray = [];
               }
-              pinArray.push(pinInZone);
-              if (index === pin.length - 1) {
-                pinsArray.push(pinArray);
-              }
+            }
+            pinArray.push(pinInZone);
+            if (index === pin.length - 1) {
+              pinsArray.push(pinArray);
             }
           });
           return res.status(200).json(pinsArray);

@@ -2,6 +2,16 @@
 const pinModel = require("../models/pinModel");
 const Pin = require("../models/pinModel");
 
+const sortPin = (a, b) => {
+  if (parseFloat(a.created_time) > parseFloat(b.created_time)) {
+    return -1;
+  }
+  if (parseFloat(a.created_time) < parseFloat(b.created_time)) {
+    return 1;
+  }
+  return 0;
+};
+
 exports.types = (req, res) => {
   const { type, maxLat, maxLng, minLat, minLng } = req.query;
 
@@ -29,12 +39,18 @@ exports.types = (req, res) => {
                 prevPin.postions?.lat !== pinInZone.postions?.lat ||
                 prevPin.postions?.lng !== pinInZone.postions?.lng
               ) {
+                if (pinArray.length > 1) {
+                  pinArray.sort(sortPin);
+                }
                 pinsArray.push(pinArray);
                 pinArray = [];
               }
             }
             pinArray.push(pinInZone);
             if (index === pin.length - 1) {
+              if (pinArray.length > 1) {
+                pinArray.sort(sortPin);
+              }
               pinsArray.push(pinArray);
             }
           });
@@ -62,12 +78,18 @@ exports.types = (req, res) => {
                 prevPin.postions?.lat !== pinInZone.postions?.lat ||
                 prevPin.postions?.lng !== pinInZone.postions?.lng
               ) {
+                if (pinArray.length > 1) {
+                  pinArray.sort(sortPin);
+                }
                 pinsArray.push(pinArray);
                 pinArray = [];
               }
             }
             pinArray.push(pinInZone);
             if (index === pin.length - 1) {
+              if (pinArray.length > 1) {
+                pinArray.sort(sortPin);
+              }
               pinsArray.push(pinArray);
             }
           });

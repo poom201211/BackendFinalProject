@@ -1,21 +1,6 @@
 // import pin Model
+const pinModel = require("../models/pinModel");
 const Pin = require("../models/pinModel");
-
-const sortPin = (a, b) => {
-  if (a.postions.lat < b.postions.lat) {
-    return -1;
-  }
-  if (a.postions.lat > b.postions.lat) {
-    return 1;
-  }
-  if (a.postions.lng < b.postions.lng) {
-    return -1;
-  }
-  if (a.postions.lng > b.postions.lng) {
-    return 1;
-  }
-  return 0;
-};
 
 exports.types = (req, res) => {
   const { type, maxLat, maxLng, minLat, minLng } = req.query;
@@ -26,75 +11,89 @@ exports.types = (req, res) => {
     return res.status(500).json({ message: "Invalid type" });
   }
   if (type === "all") {
-    Pin.find({}, (err, pin) => {
-      if (err) {
-        return res.status(500).json({ message: err.message });
-      } else {
-        console.log(pin);
-        const inZone = pin.filter(
-          (p) =>
-            p.postions.lat > parseFloat(minLat) &&
-            p.postions.lat < parseFloat(maxLat) &&
-            p.postions.lng > parseFloat(minLng) &&
-            p.postions.lng < parseFloat(maxLng)
-        );
-        const pinsArray = [];
-        let pinArray = [];
-        inZone.sort(sortPin);
-        inZone.forEach((pinInZone, index) => {
-          if (index !== 0) {
-            const prevPin = inZone[index - 1];
+    Pin.find(
+      {
+        "postions.lat": { $gt: parseFloat(minLat) , $lt: parseFloat(maxLat)},"postions.lng": { $gt: parseFloat(minLng) , $lt: parseFloat(maxLng)}
+      },
+      (err, pin) => {
+        if (err) {
+          return res.status(500).json({ message: err.message });
+        } else {
+          const pinsArray = [];
+          let pinArray = [];
+          pin.forEach((pinInZone, index) => {
             if (
-              prevPin.postions.lat !== pinInZone.postions.lat ||
-              prevPin.postions.lng !== pinInZone.postions.lng
+              pinInZone.postions &&
+              pinInZone.postions?.lat > parseFloat(minLat) &&
+              pinInZone.postions?.lat < parseFloat(maxLat) &&
+              pinInZone.postions?.lng > parseFloat(minLng) &&
+              pinInZone.postions?.lng < parseFloat(maxLng)
             ) {
-              pinsArray.push(pinArray);
-              pinArray = [];
+  
+              if (index !== 0) {
+                const prevPin = pin[index - 1];
+                if (
+                  prevPin.postions?.lat !== pinInZone.postions?.lat ||
+                  prevPin.postions?.lng !== pinInZone.postions?.lng
+                ) {
+                  pinsArray.push(pinArray);
+                  pinArray = [];
+                }
+              }
+              pinArray.push(pinInZone);
+              if (index === pin.length - 1) {
+                pinsArray.push(pinArray);
+              }
             }
-          }
-          pinArray.push(pinInZone);
-          if(index === inZone.length-1){
-            pinsArray.push(pinArray); 
-          }
-        });
-        console.log(pinsArray)
-        return res.status(200).json(pinsArray);
+          });
+          return res.status(200).json(pinsArray);
+        }
       }
-    });
+    );
   } else {
-    Pin.find({ type: req.query.type }, (err, pin) => {
+    Pin.find({ type: req.query.type,     "postions.lat": { $gt: parseFloat(minLat) , $lt: parseFloat(maxLat)},"postions.lng": { $gt: parseFloat(minLng) , $lt: parseFloat(maxLng)}}, (err, pin) => {
       if (err) {
         return res.status(500).json({ message: err.message });
       } else {
-        const inZone = pin.filter(
-          (p) =>
-            p.postions.lat > parseFloat(minLat) &&
-            p.postions.lat < parseFloat(maxLat) &&
-            p.postions.lng > parseFloat(minLng) &&
-            p.postions.lng < parseFloat(maxLng)
-        );
         const pinsArray = [];
         let pinArray = [];
-        inZone.sort(sortPin);
-        inZone.forEach((pinInZone, index) => {
-          if (index !== 0) {
-            const prevPin = inZone[index - 1];
-            if (
-              prevPin.postions.lat !== pinInZone.postions.lat ||
-              prevPin.postions.lng !== pinInZone.postions.lng
-            ) {
+        pin.forEach((pinInZone, index) => {
+          if (
+            pinInZone.postions &&
+            pinInZone.postions?.lat > parseFloat(minLat) &&
+            pinInZone.postions?.lat < parseFloat(maxLat) &&
+            pinInZone.postions?.lng > parseFloat(minLng) &&
+            pinInZone.postions?.lng < parseFloat(maxLng)
+          ) {
+            if (index !== 0) {
+              const prevPin = pin[index - 1];
+              if (
+                prevPin.postions?.lat !== pinInZone.postions?.lat ||
+                prevPin.postions?.lng !== pinInZone.postions?.lng
+              ) {
+                pinsArray.push(pinArray);
+                pinArray = [];
+              }
+            }
+            pinArray.push(pinInZone);
+            if (index === pin.length - 1) {
               pinsArray.push(pinArray);
-              pinArray = [];
             }
           }
-          pinArray.push(pinInZone);
-          if(index === inZone.length-1){
-            pinsArray.push(pinArray); 
-          }
         });
-        console.log(pinsArray)
         return res.status(200).json(pinsArray);
       }
     });
   }
 };
+
+exports.getKratoo = (req,res) => {
+  const {kratooId} = req.params
+  Pin.findOne({kratooID:kratooId},(err,kratoo)=>{
+    if (err) {
+      return res.status(500).json({ message: err.message });
+    } else {
+      return res.status(200).json({kratoo:kratoo})
+    }
+  })
+}

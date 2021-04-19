@@ -71,6 +71,7 @@ exports.userContent = async (req, res) => {
 
 exports.convertContentToPin = async (req, res) => {
   try {
+    var count = 0;
     var allContent = await content.find();
     var resultPin = [];
     for (const content of allContent) {
@@ -139,7 +140,8 @@ exports.convertContentToPin = async (req, res) => {
         },
       };
       resultPin.push(storePin);
-      console.log(pinContent);
+      count+=1
+      console.log(count);
     }
     console.log(resultPin);
     pin.bulkWrite(resultPin);

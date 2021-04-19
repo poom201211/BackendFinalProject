@@ -28,7 +28,7 @@ exports.convertContentToPin = async (req, res) => {
     for (const content of allContent) {
       var titleGEO = encodeURI(content._source.title);
       const geoAPI = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${titleGEO}&key=AIzaSyAKX_x92biMVN3S7wz9zCbYqcqyIRIbtl4`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${titleGEO}&key=${key}`
       );
       const geoResult = await geoAPI.json();
       var descArray = "";

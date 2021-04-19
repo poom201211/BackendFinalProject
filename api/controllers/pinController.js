@@ -13,7 +13,8 @@ exports.types = (req, res) => {
   if (type === "all") {
     Pin.find(
       {
-        "postions.lat": { $gt: parseFloat(minLat) , $lt: parseFloat(maxLat)},"postions.lng": { $gt: parseFloat(minLng) , $lt: parseFloat(maxLng)}
+        "postions.lat": { $gt: parseFloat(minLat), $lt: parseFloat(maxLat) },
+        "postions.lng": { $gt: parseFloat(minLng), $lt: parseFloat(maxLng) },
       },
       (err, pin) => {
         if (err) {
@@ -22,23 +23,14 @@ exports.types = (req, res) => {
           const pinsArray = [];
           let pinArray = [];
           pin.forEach((pinInZone, index) => {
-            if (
-              pinInZone.postions &&
-              pinInZone.postions?.lat > parseFloat(minLat) &&
-              pinInZone.postions?.lat < parseFloat(maxLat) &&
-              pinInZone.postions?.lng > parseFloat(minLng) &&
-              pinInZone.postions?.lng < parseFloat(maxLng)
-            ) {
-  
-              if (index !== 0) {
-                const prevPin = pin[index - 1];
-                if (
-                  prevPin.postions?.lat !== pinInZone.postions?.lat ||
-                  prevPin.postions?.lng !== pinInZone.postions?.lng
-                ) {
-                  pinsArray.push(pinArray);
-                  pinArray = [];
-                }
+            if (index !== 0) {
+              const prevPin = pin[index - 1];
+              if (
+                prevPin.postions?.lat !== pinInZone.postions?.lat ||
+                prevPin.postions?.lng !== pinInZone.postions?.lng
+              ) {
+                pinsArray.push(pinArray);
+                pinArray = [];
               }
               pinArray.push(pinInZone);
               if (index === pin.length - 1) {
@@ -51,20 +43,19 @@ exports.types = (req, res) => {
       }
     );
   } else {
-    Pin.find({ type: req.query.type,     "postions.lat": { $gt: parseFloat(minLat) , $lt: parseFloat(maxLat)},"postions.lng": { $gt: parseFloat(minLng) , $lt: parseFloat(maxLng)}}, (err, pin) => {
-      if (err) {
-        return res.status(500).json({ message: err.message });
-      } else {
-        const pinsArray = [];
-        let pinArray = [];
-        pin.forEach((pinInZone, index) => {
-          if (
-            pinInZone.postions &&
-            pinInZone.postions?.lat > parseFloat(minLat) &&
-            pinInZone.postions?.lat < parseFloat(maxLat) &&
-            pinInZone.postions?.lng > parseFloat(minLng) &&
-            pinInZone.postions?.lng < parseFloat(maxLng)
-          ) {
+    Pin.find(
+      {
+        type: req.query.type,
+        "postions.lat": { $gt: parseFloat(minLat), $lt: parseFloat(maxLat) },
+        "postions.lng": { $gt: parseFloat(minLng), $lt: parseFloat(maxLng) },
+      },
+      (err, pin) => {
+        if (err) {
+          return res.status(500).json({ message: err.message });
+        } else {
+          const pinsArray = [];
+          let pinArray = [];
+          pin.forEach((pinInZone, index) => {
             if (index !== 0) {
               const prevPin = pin[index - 1];
               if (
@@ -79,21 +70,21 @@ exports.types = (req, res) => {
             if (index === pin.length - 1) {
               pinsArray.push(pinArray);
             }
-          }
-        });
-        return res.status(200).json(pinsArray);
+          });
+          return res.status(200).json(pinsArray);
+        }
       }
-    });
+    );
   }
 };
 
-exports.getKratoo = (req,res) => {
-  const {kratooId} = req.params
-  Pin.findOne({kratooID:kratooId},(err,kratoo)=>{
+exports.getKratoo = (req, res) => {
+  const { kratooId } = req.params;
+  Pin.findOne({ kratooID: kratooId }, (err, kratoo) => {
     if (err) {
       return res.status(500).json({ message: err.message });
     } else {
-      return res.status(200).json({kratoo:kratoo})
+      return res.status(200).json({ kratoo: kratoo });
     }
-  })
-}
+  });
+};

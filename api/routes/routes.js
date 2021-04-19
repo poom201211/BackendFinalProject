@@ -25,9 +25,9 @@ module.exports = function (app) {
 
   // Pin routes
   app.route("/pin").get(pinController.types);
+  app.route("/kratoo/:kratooId").get(pinController.getKratoo);
 
   // Content routes
-  app.route("/kratoo/:kratooId").get(contentController.userContent);
   app.route("/load_data").get(contentController.convertContentToPin);
 
   // List of collection methods routes

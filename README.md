@@ -1,6 +1,6 @@
 # Pineview Backend
 
-![Backend-Images](https://github.com/poom201211/BackendFinalProject/images/BackendImage.png)
+![Backend-Images](https://github.com/poom201211/BackendFinalProject/blob/main/images/BackendImage.png)
 
 ## Description
 

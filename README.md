@@ -8,7 +8,7 @@ This repository is the main backend repository for our application Pineview. Wri
 
 ## Prerequisites
 
-- Node.js version 3 or above
+- Node.js version 13 or above
 
 ## Installation
 
@@ -28,13 +28,22 @@ $ cd BackendFinalProject
 
 ```
 $ npm install
+
+// For yarn:
+
+$ yarn
 ```
 
 4. Run the backend
 
 ```
-$ node server.js
+$ npm run start
+
+// For yarn:
+
+$ yarn start
 ```
+
 
 ## Backend Developers
 
